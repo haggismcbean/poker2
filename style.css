@@ -1,0 +1,33 @@
+body * {
+	text-decoration: none;
+	color: black;
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+.chosen-true {
+	background-color: #79AF79;
+	color: green;
+}
+
+#clear {
+	clear: both;
+}
+
+#card {
+	display: inline-block;
+	height: 38px;
+	width: 38px;
+	border: 1px solid black;
+	float: left;
+}
+
+#container {
+	display: inline-block;
+	width: 520px;
+	height: 520px;
+	border: 1px solid black;
+	float: left;
+	margin: 10px;
+}
