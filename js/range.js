@@ -1,15 +1,17 @@
-function Range(rangeAsString) {
-	this.translateString(rangeAsString);
+function Range(percent) {
+	this.percent = percent;
+	this.cards = this.getPreFlopRange(this.percent);
 }
 
-Range.prototype.translateString = function(rangeAsString) {
-	rangeAsString = rangeAsString.split(", ");
-	for(var i=0; i < rangeAsString.length; i++) {
-		if(rangeAsString[i][2]) {
-			
-		}
+Range.prototype.getPreFlopRange = function(percent) {
+	var numberCards = Math.floor(preFlopRange.length * percent);
+	this.cards = [];
+	for(var i=0; i < numberCards; i++) {
+		this.cards.push(preFlopRange[i]);
 	}
+	console.log(JSON.stringify(this.cards, 0, 2));
 }
+
 
 Range.prototype.sortHands = function(hands) {
 	hands.sort(function(a, b) {
@@ -44,4 +46,4 @@ Range.prototype.randomCard = function() {
 	return this.deck.cards[random];
 }
 
-var range = new Range("AQs+, KK+");
+var range = new Range(0.1);
