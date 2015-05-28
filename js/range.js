@@ -1,15 +1,15 @@
 function Range(percent) {
 	this.percent = percent;
-	this.cards = this.getPreFlopRange(this.percent);
+	this.pocketPairs = this.getPreFlopRange(this.percent);
 }
 
 Range.prototype.getPreFlopRange = function(percent) {
 	var numberCards = Math.floor(preFlopRange.length * percent);
-	this.cards = [];
+	var cards = [];
 	for(var i=0; i < numberCards; i++) {
-		this.cards.push(preFlopRange[i]);
+		cards.push(preFlopRange[i]);
 	}
-	console.log(JSON.stringify(this.cards, 0, 2));
+	return cards;
 }
 
 
