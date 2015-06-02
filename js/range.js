@@ -12,7 +12,6 @@ Range.prototype.getPreFlopRange = function(percent) {
 	return cards;
 }
 
-
 Range.prototype.sortHands = function(hands) {
 	hands.sort(function(a, b) {
 		if (a.strength > b.strength) {
@@ -45,5 +44,3 @@ Range.prototype.randomCard = function() {
 	var random = Math.floor(Math.random() * this.deck.cards.length);
 	return this.deck.cards[random];
 }
-
-var range = new Range(0.1);

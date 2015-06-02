@@ -20,6 +20,11 @@ Hand.prototype.getStrength = function() {
 	} else {
 		this.checkMatches();
 	}
+
+	//if we have a straight and the ace is low
+	if ((this.strength === 4 || this.strength === 8) && this.aceLow) {
+		this.sortAceLow();
+	}
 }
 
 Hand.prototype.checkFlush = function() {
@@ -48,12 +53,17 @@ Hand.prototype.checkAceLow = function() {
 	var c = this.cards;
 
 	if (c[0].rank === 12 && c[1].rank === 3 && c[2].rank === 2 && c[3].rank === 1 && c[4].rank === 0) {
-		//make ace low
-		// c[0].rank = -1;
-		this.sortRank();
+		this.aceLow = true;
 		return true;
 	}
 	return false;
+}
+
+Hand.prototype.sortAceLow = function() {
+	var ace = this.cards[0];
+	ace.rank = -1;
+	this.sortRank();
+	ace.rank = 12;
 }
 
 Hand.prototype.checkMatches = function() {
