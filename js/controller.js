@@ -18,7 +18,6 @@
 	Make decisions based on this.
 
 	Before I go on with this range stuff, there are important hand strength things to be fixed, in the following order:
-		2. hand strengths in general = store hand.strength as eg [8,12,12,12,12,11]
 		3. monte carlo turn and rivers and averaging hand.strength
 */
 
