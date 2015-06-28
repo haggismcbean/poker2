@@ -31,3 +31,8 @@ Deck.prototype.insertCard = function(card, position) {
 	this.cards.push(card);
 	this.cards = this.cards.concat(restOfDeck);
 }
+
+Deck.prototype.randomCard = function() {
+	var random = Math.floor(Math.random() * this.cards.length);
+	return this.drawCard(this.cards[random]);
+}

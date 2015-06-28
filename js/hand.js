@@ -1,11 +1,5 @@
-function Hand(pocketPair, flop, turn, river) {
+function Hand(pocketPair, flop) {
 	this.cards = pocketPair.cards.concat(flop.cards);
-	if (turn) {
-		this.cards = this.cards.concat(turn.card);
-	}
-	if (river) {
-		this.cards = this.cards.concat(river.card);
-	}
 	this.sortRank();
 	this.getStrength();
 }
