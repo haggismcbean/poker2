@@ -55,9 +55,11 @@ Range.prototype.monteCarloStrength = function(flop) {
 		this.createSevenCardArray(random1, random2, flop);
 		
 		var combos = this.calculateCombos();
-		var strengths = this.calculateFiveCardStrengths(combos);
-		var bestCombo = this.findBestCombo(combos, strengths);
+		var cards = this.calculateFiveCardStrengths(combos);
+		var bestCombo = this.findBestCombo(cards);
 		//find strongest combo in strengths
+		var winners = [];
+		winners.push(bestCombo);
 
 		//store [strength, card1, card2, card3, card4, card5]
 
@@ -65,21 +67,47 @@ Range.prototype.monteCarloStrength = function(flop) {
 		this.cards.splice(2,5);
 		this.reinsertCards([random1, random2]);
 	}
+	log(winners);
 	//sort strength store, get middle strength. that's how strong this pocket pair is.
 }
 
+Range.prototype.findBestCombo = function(cards) {
+	for(var i=0; i < cards.length; i++) {
+		this.sortCards(cards[i].cards, cards[i].aceLow);
+	}
+	this.sortHands(cards);
+	return cards[0];
+}
+
 Range.prototype.calculateFiveCardStrengths = function(combos) {
-	var strengths = [];
-	var aceLows = [];
+	var cards = [];
+	aceLows = [];
 	for(var i=0; i < combos.length; i++) {
 		var ranks = this.getRanks(combos[i]);
 		var suits = this.getSuits(combos[i]);
 		
 		var strength = this.rankPokerHand(ranks, suits); // Royal Flush
-		strengths.push(strength);
+		
+		var fiveCards = this.createFiveCardArray(ranks, suits, strength, this.aceLow);
+		cards.push(fiveCards);
 		aceLows.push(this.aceLow);
 	}
-	return strengths;
+	return cards;
+}
+
+Range.prototype.createFiveCardArray = function(ranks, suits, strength, aceLow) {
+	var card = {
+		strength : strength,
+		aceLow: aceLow
+	}
+	card.cards = [];
+	for (var i=0; i < ranks.length; i++) {
+		newCard = {};
+		newCard.rank = ranks[i];
+		newCard.suit = suits[i];
+		card.cards.push(newCard);
+	}
+	return card;
 }
 
 Range.prototype.getRanks = function(combo) {
@@ -125,6 +153,22 @@ Range.prototype.createSevenCardArray = function(random1, random2, flop) {
 Range.prototype.reinsertCards = function(cards) {
 	for(var i=cards.length - 1; i > -1; i--){
 		deck.insertCard(cards[i], 0);
+	}
+}
+
+Range.prototype.sortCards = function(cards, aceLow) {
+	cards.sort(function(a, b) {
+		if (a.rank > b.rank) {
+			return -1;
+		}
+		if (b.rank > a.rank) {
+			return 1;
+		}
+		return 0;
+	})
+	if (aceLow) {
+		var ace = cards.splice(0, 1);
+		cards = cards.concat(ace);
 	}
 }
 
