@@ -3,7 +3,7 @@ function Range(percent) {
 	this.percent = percent;
 	this.pocketPairs = this.getPreFlopRange(this.percent);
 	this.cards = [];
-	this.MONTE_CARLO_COUNT = 1;
+	this.MONTE_CARLO_COUNT = 1000;
 }
 
 Range.prototype.getPreFlopRange = function(percent) {
@@ -40,25 +40,34 @@ Range.prototype.calculateStrength = function(flop) {
 		this.cards.push(pocket1);
 		this.cards.push(pocket2);
 
-		this.monteCarloStrength(flop);
-		
+		this.pocketPairs[i].averageStrength = {};
+
+		this.pocketPairs[i].averageStrength = this.monteCarloStrength(flop);
 		this.reinsertCards([pocket1, pocket2]);
 	}
+	this.sortPocketPairs(this.pocketPairs)
+	log(this.pocketPairs);
 }
 
 Range.prototype.monteCarloStrength = function(flop) {
 	//draw 2 random cards from deck
+	var winners = [];
+	var random1;
+	var random2;
+	var combos;
+	var cards;
+	var bestCombo;
+
 	for(var i=0; i < this.MONTE_CARLO_COUNT; i++) {
-		var random1 = deck.randomCard();
-		var random2 = deck.randomCard();
+		random1 = deck.randomCard();
+		random2 = deck.randomCard();
 
 		this.createSevenCardArray(random1, random2, flop);
 		
-		var combos = this.calculateCombos();
-		var cards = this.calculateFiveCardStrengths(combos);
-		var bestCombo = this.findBestCombo(cards);
+		combos = this.calculateCombos();
+		cards = this.calculateFiveCardStrengths(combos);
+		bestCombo = this.findBestCombo(cards);
 		//find strongest combo in strengths
-		var winners = [];
 		winners.push(bestCombo);
 
 		//store [strength, card1, card2, card3, card4, card5]
@@ -67,8 +76,37 @@ Range.prototype.monteCarloStrength = function(flop) {
 		this.cards.splice(2,5);
 		this.reinsertCards([random1, random2]);
 	}
-	log(winners);
+	return this.averageStrength(winners);
 	//sort strength store, get middle strength. that's how strong this pocket pair is.
+}
+
+Range.prototype.averageStrength = function(winners) {
+	var averageStrength = {};
+	averageStrength.strength = 0
+	averageStrength.cards = [
+		{
+	      "rank": 0
+	    },
+	    {
+	      "rank": 0
+	    },
+	    {
+	      "rank": 0
+	    },
+	    {
+	      "rank": 0
+	    },
+	    {
+	      "rank": 0
+	    }
+    ];
+	for(var i=0; i < winners.length; i++) {
+		averageStrength.strength += winners[i].strength / winners.length;
+		for(var j=0; j < winners[i].cards.length; j++) {
+			averageStrength.cards[j].rank += winners[i].cards[j].rank / winners.length;
+		}
+	}	
+	return averageStrength;
 }
 
 Range.prototype.findBestCombo = function(cards) {
@@ -170,6 +208,26 @@ Range.prototype.sortCards = function(cards, aceLow) {
 		var ace = cards.splice(0, 1);
 		cards = cards.concat(ace);
 	}
+}
+
+Range.prototype.sortPocketPairs = function(pocketPairs) {
+	pocketPairs.sort(function(a, b) {
+		if (a.averageStrength.strength > b.averageStrength.strength + 0.2) {
+			return -1;
+		}
+		if (b.averageStrength.strength > a.averageStrength.strength + 0.2) {
+			return 1;
+		}
+		for(var i=0; i < a.averageStrength.cards.length; i++) {
+			if (a.averageStrength.cards[i].rank > b.averageStrength.cards[i].rank) {
+				return -1;
+			}
+			if (b.averageStrength.cards[i].rank > a.averageStrength.cards[i].rank) {
+				return 1;
+			}
+		}
+		return 0;
+	})
 }
 
 Range.prototype.sortHands = function(hands) {
