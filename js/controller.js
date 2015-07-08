@@ -1,30 +1,63 @@
 /*
 	Next steps:
-		player object with stack size
-		table object with blind size, money in pot size
 		calculate cut off points
 */
+
+/*
+var deck = new Deck();
 
 var table = new Table(10, 5);
 var hero = new Player(200);
 var villain = new Player(1000);
 
-var pocketPair;
-var hands = [];
-var hand;
-
-var deck = new Deck();
-
 var rangePercent = 0.0136;
 range = new Range(rangePercent);
-
-var flop1 = deck.drawCard({suit: 2, rank: 11});
-var flop2 = deck.drawCard({suit: 3, rank: 2});
-var flop3 = deck.drawCard({suit: 2, rank: 3});
-
-var flop = new Flop(flop1, flop2, flop3);
 
 range.removeCards(flop.cards);
 
 range.calculateStrength(flop.cards);
 
+log(range.pocketPairs);
+
+
+ Below is what i'm aiming for
+*/
+//-------- init: 	  -----------
+
+var table = new Table(10, 5);
+var hero = new Player(200);
+var villain = new Player(1000);
+
+
+//-------- per hand: -----------
+
+
+table.newHand();
+
+villain.raise(30);
+
+hero.setRange(0.0136);
+hero.call();
+
+var cards = [
+	{
+		suit: 1, 
+		rank: 10
+	},
+	{
+		suit: 1, 
+		rank: 12
+	},
+	{
+		suit: 1, 
+		rank: 11
+	}
+]
+
+table.seeFlop(cards);
+hero.range.removeCards(table.flop.cards);
+
+villain.raise(40);
+hero.calculateDecision(table.flop);
+
+log(hero.range.pocketPairs);

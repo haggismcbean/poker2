@@ -34,15 +34,15 @@ Range.prototype.calculateStrength = function(flop) {
 	for(var i=0; i < this.pocketPairs.length; i++) {
 		this.cards = [];
 		//draw range cards from deck
-		var pocket1 = deck.drawCard(this.pocketPairs[i].cards[0]);
-		var pocket2 = deck.drawCard(this.pocketPairs[i].cards[1]);
+		var pocket1 = table.deck.drawCard(this.pocketPairs[i].cards[0]);
+		var pocket2 = table.deck.drawCard(this.pocketPairs[i].cards[1]);
 
 		this.cards.push(pocket1);
 		this.cards.push(pocket2);
 
 		this.pocketPairs[i].averageStrength = {};
-
 		this.pocketPairs[i].averageStrength = this.monteCarloStrength(flop);
+
 		this.reinsertCards([pocket1, pocket2]);
 	}
 	this.sortPocketPairs(this.pocketPairs)
@@ -58,17 +58,17 @@ Range.prototype.monteCarloStrength = function(flop) {
 	var bestCombo;
 
 	for(var i=0; i < this.MONTE_CARLO_COUNT; i++) {
-		random1 = deck.randomCard();
-		random2 = deck.randomCard();
+		random1 = table.deck.randomCard();
+		random2 = table.deck.randomCard();
 
 		this.createSevenCardArray(random1, random2, flop);
-		
+
 		combos = this.calculateCombos();
+
 		cards = this.calculateFiveCardStrengths(combos);
 		bestCombo = this.findBestCombo(cards);
 		//find strongest combo in strengths
 		winners.push(bestCombo);
-
 		//store [strength, card1, card2, card3, card4, card5]
 
 		//insert 2 random cards
@@ -124,7 +124,7 @@ Range.prototype.calculateFiveCardStrengths = function(combos) {
 		var suits = this.getSuits(combos[i]);
 		
 		var strength = this.rankPokerHand(ranks, suits); // Royal Flush
-		
+
 		var fiveCards = this.createFiveCardArray(ranks, suits, strength, this.aceLow);
 		cards.push(fiveCards);
 		aceLows.push(this.aceLow);
@@ -184,12 +184,12 @@ Range.prototype.getSuits = function(combo) {
 Range.prototype.createSevenCardArray = function(random1, random2, flop) {
 	this.cards.push(random1);
 	this.cards.push(random2);
-	this.cards = this.cards.concat(flop);
+	this.cards = this.cards.concat(flop.cards);
 }
 
 Range.prototype.reinsertCards = function(cards) {
 	for(var i=cards.length - 1; i > -1; i--){
-		deck.insertCard(cards[i], 0);
+		table.deck.insertCard(cards[i], 0);
 	}
 }
 
