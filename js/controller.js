@@ -1,24 +1,13 @@
 /*
-	We have a Deck.
-
-	We have a Player.
-
-		Each player has a range - made up of pocket pairs. these are drawn from the deck then reinserted into the deck
-		Each player has a flop - made up of cards. these are drawn from the deck.
-		Each player has a stack
-
-	Before the flop a player is assigned a range.
-
-	The flop hits. The player's range has less cards in it because of this (not sure if needs to be hard coded)
-
-	The player's range strength is reevaluated based on the flop
-
-	Order the player's range by strength
-
-	Make decisions based on this.
-
-	NEXT STEP: EVALUATE THE 21 combos of five possible cards 
+	Next steps:
+		player object with stack size
+		table object with blind size, money in pot size
+		calculate cut off points
 */
+
+var table = new Table(10, 5);
+var hero = new Player(200);
+var villain = new Player(1000);
 
 var pocketPair;
 var hands = [];
@@ -38,3 +27,4 @@ var flop = new Flop(flop1, flop2, flop3);
 range.removeCards(flop.cards);
 
 range.calculateStrength(flop.cards);
+

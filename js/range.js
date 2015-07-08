@@ -46,7 +46,6 @@ Range.prototype.calculateStrength = function(flop) {
 		this.reinsertCards([pocket1, pocket2]);
 	}
 	this.sortPocketPairs(this.pocketPairs)
-	log(this.pocketPairs);
 }
 
 Range.prototype.monteCarloStrength = function(flop) {
