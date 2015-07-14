@@ -1,9 +1,26 @@
+var p;
+var pocket1;
+var pocket2; 
+var winners = [];
+var random1;
+var random2;
+var combos;
+var cards;
+var bestCombo;
+var averageStrength;
+var aceLows;
+var ranks;
+var suits;
+var strength;
+var fiveCards;
+
 //percent is a number between 0 and 1
 function Range(percent) {
 	this.percent = percent;
 	this.pocketPairs = this.getPreFlopRange(this.percent);
 	this.cards = [];
-	this.MONTE_CARLO_COUNT = 1000;
+	this.MONTE_CARLO_COUNT = 100;
+	this.CONFIDENCE = 0.2;
 }
 
 Range.prototype.getPreFlopRange = function(percent) {
@@ -23,7 +40,7 @@ Range.prototype.removeCards = function(cards) {
 
 Range.prototype.removeCard = function(card) {
 	for(var i=this.pocketPairs.length - 1; i > -1; i--) {
-		var p = this.pocketPairs[i];
+		p = this.pocketPairs[i];
 		if ((p.cards[0].suit === card.suit && p.cards[0].rank === card.rank) || (p.cards[1].suit === card.suit && p.cards[1].rank === card.rank)) {
 			this.pocketPairs.splice(i, 1);
 		}
@@ -34,8 +51,8 @@ Range.prototype.calculateStrength = function(flop) {
 	for(var i=0; i < this.pocketPairs.length; i++) {
 		this.cards = [];
 		//draw range cards from deck
-		var pocket1 = table.deck.drawCard(this.pocketPairs[i].cards[0]);
-		var pocket2 = table.deck.drawCard(this.pocketPairs[i].cards[1]);
+		pocket1 = table.deck.drawCard(this.pocketPairs[i].cards[0]);
+		pocket2 = table.deck.drawCard(this.pocketPairs[i].cards[1]);
 
 		this.cards.push(pocket1);
 		this.cards.push(pocket2);
@@ -49,14 +66,6 @@ Range.prototype.calculateStrength = function(flop) {
 }
 
 Range.prototype.monteCarloStrength = function(flop) {
-	//draw 2 random cards from deck
-	var winners = [];
-	var random1;
-	var random2;
-	var combos;
-	var cards;
-	var bestCombo;
-
 	for(var i=0; i < this.MONTE_CARLO_COUNT; i++) {
 		random1 = table.deck.randomCard();
 		random2 = table.deck.randomCard();
@@ -67,44 +76,21 @@ Range.prototype.monteCarloStrength = function(flop) {
 
 		cards = this.calculateFiveCardStrengths(combos);
 		bestCombo = this.findBestCombo(cards);
-		//find strongest combo in strengths
 		winners.push(bestCombo);
-		//store [strength, card1, card2, card3, card4, card5]
 
 		//insert 2 random cards
 		this.cards.splice(2,5);
 		this.reinsertCards([random1, random2]);
 	}
 	return this.averageStrength(winners);
-	//sort strength store, get middle strength. that's how strong this pocket pair is.
 }
 
 Range.prototype.averageStrength = function(winners) {
-	var averageStrength = {};
-	averageStrength.strength = 0
-	averageStrength.cards = [
-		{
-	      "rank": 0
-	    },
-	    {
-	      "rank": 0
-	    },
-	    {
-	      "rank": 0
-	    },
-	    {
-	      "rank": 0
-	    },
-	    {
-	      "rank": 0
-	    }
-    ];
+	averageStrength =  0;
+
 	for(var i=0; i < winners.length; i++) {
-		averageStrength.strength += winners[i].strength / winners.length;
-		for(var j=0; j < winners[i].cards.length; j++) {
-			averageStrength.cards[j].rank += winners[i].cards[j].rank / winners.length;
-		}
-	}	
+		averageStrength += winners[i].strength / winners.length;
+	}
 	return averageStrength;
 }
 
@@ -119,13 +105,14 @@ Range.prototype.findBestCombo = function(cards) {
 Range.prototype.calculateFiveCardStrengths = function(combos) {
 	var cards = [];
 	aceLows = [];
-	for(var i=0; i < combos.length; i++) {
-		var ranks = this.getRanks(combos[i]);
-		var suits = this.getSuits(combos[i]);
-		
-		var strength = this.rankPokerHand(ranks, suits); // Royal Flush
 
-		var fiveCards = this.createFiveCardArray(ranks, suits, strength, this.aceLow);
+	for(var i=0; i < combos.length; i++) {
+		ranks = this.getRanks(combos[i]);
+		suits = this.getSuits(combos[i]);
+		
+		strength = this.rankPokerHand(ranks, suits); // Royal Flush
+
+		fiveCards = this.createFiveCardArray(ranks, suits, strength, this.aceLow);
 		cards.push(fiveCards);
 		aceLows.push(this.aceLow);
 	}
@@ -158,8 +145,10 @@ Range.prototype.getRanks = function(combo) {
 
 Range.prototype.getSuits = function(combo) {
 	var suits = [];
+	var suit; 
+
 	for(var i=0; i < combo.length; i++) {
-		var suit = this.cards[combo[i]].suit;
+		suit = this.cards[combo[i]].suit;
 		switch(suit) {
 			case 0 : 
 				suit = 8;
@@ -211,17 +200,17 @@ Range.prototype.sortCards = function(cards, aceLow) {
 
 Range.prototype.sortPocketPairs = function(pocketPairs) {
 	pocketPairs.sort(function(a, b) {
-		if (a.averageStrength.strength > b.averageStrength.strength + 0.2) {
+		if (a.averageStrength > b.averageStrength + this.CONFIDENCE) {
 			return -1;
 		}
-		if (b.averageStrength.strength > a.averageStrength.strength + 0.2) {
+		if (b.averageStrength > a.averageStrength + this.CONFIDENCE) {
 			return 1;
 		}
-		for(var i=0; i < a.averageStrength.cards.length; i++) {
-			if (a.averageStrength.cards[i].rank > b.averageStrength.cards[i].rank) {
+		for(var i=0; i < a.cards.length; i++) {
+			if (a.cards[i].rank > b.cards[i].rank) {
 				return -1;
 			}
-			if (b.averageStrength.cards[i].rank > a.averageStrength.cards[i].rank) {
+			if (b.cards[i].rank > a.cards[i].rank) {
 				return 1;
 			}
 		}
@@ -263,14 +252,16 @@ Range.prototype.calculateCombos = function() {
 	var n = 7;
 	//we have seven cards. we want to get all possible combinations of 5 cards out of these seven. there are 21 different combos. 
     var result = [], comb = [];
-        function next_comb(comb, k, n ,i) {
-            if (comb.length === 0) {for (i = 0; i < k; ++i) {comb[i] = i;} return true;}
-            i = k - 1; ++comb[i];
-            while ((i > 0) && (comb[i] >= n - k + 1 + i)) { --i; ++comb[i];}
-            if (comb[0] > n - k) {return false;} // No more combinations can be generated
-            for (i = i + 1; i < k; ++i) {comb[i] = comb[i-1] + 1;}
-            return true;
-        }
+
+    function next_comb(comb, k, n ,i) {
+        if (comb.length === 0) {for (i = 0; i < k; ++i) {comb[i] = i;} return true;}
+        i = k - 1; ++comb[i];
+        while ((i > 0) && (comb[i] >= n - k + 1 + i)) { --i; ++comb[i];}
+        if (comb[0] > n - k) {return false;} // No more combinations can be generated
+        for (i = i + 1; i < k; ++i) {comb[i] = comb[i-1] + 1;}
+        return true;
+    }
+
     while (next_comb(comb, k, n)) { result.push(comb.slice());}
     return result;
 }
@@ -283,15 +274,15 @@ Range.prototype.rankPokerHand = function(cs,ss) {
     var handsTranslation=["4 of a Kind", "Straight Flush", "Straight", "Flush", "High Card",
     "1 Pair", "2 Pair", "Royal Flush", "3 of a Kind", "Full House" ];
 
-  var v, i, o, s = 1<<cs[0]|1<<cs[1]|1<<cs[2]|1<<cs[3]|1<<cs[4];
-  for (i=-1, v=o=0; i<5; i++, o=Math.pow(2,cs[i]*4)) {v += o*((v/o&15)+1);}
-  v = v % 15 - ((s/(s&-s) == 31) || (s == 0x403c) ? 3 : 1);
-  v -= (ss[0] == (ss[1]|ss[2]|ss[3]|ss[4])) * ((s == 0x7c00) ? -5 : 1);
+	var v, i, o, s = 1<<cs[0]|1<<cs[1]|1<<cs[2]|1<<cs[3]|1<<cs[4];
+	for (i=-1, v=o=0; i<5; i++, o=Math.pow(2,cs[i]*4)) {v += o*((v/o&15)+1);}
+	v = v % 15 - ((s/(s&-s) == 31) || (s == 0x403c) ? 3 : 1);
+	v -= (ss[0] == (ss[1]|ss[2]|ss[3]|ss[4])) * ((s == 0x7c00) ? -5 : 1);
 
-  if (s == 0x403c) {
-  	this.aceLow = true;
-  } else {
-  	this.aceLow = false;
-  }
-  return hands[v];
+	if (s == 0x403c) {
+		this.aceLow = true;
+	} else {
+		this.aceLow = false;
+	}
+	return hands[v];
 }
