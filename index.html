@@ -2,25 +2,87 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css" type="text/css">
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.js"></script>
   
   <script type="text/javascript" src="js/libs/preflop.js"></script>
   <script type="text/javascript" src="js/utils/log.js"></script>
 
-  <script type="text/javascript" src="js/card.js"></script>
-  <script type="text/javascript" src="js/deck.js"></script>
-  <script type="text/javascript" src="js/pocket-pair.js"></script>
-  <script type="text/javascript" src="js/range.js"></script>
-  <script type="text/javascript" src="js/flop.js"></script>
-  <script type="text/javascript" src="js/hand.js"></script>
+  <script type="text/javascript" src="js/poker/card.js"></script>
+  <script type="text/javascript" src="js/poker/deck.js"></script>
+  <script type="text/javascript" src="js/poker/pocket-pair.js"></script>
+  <script type="text/javascript" src="js/poker/range.js"></script>
+  <script type="text/javascript" src="js/poker/flop.js"></script>
+  <script type="text/javascript" src="js/poker/hand.js"></script>
 
-  <script type="text/javascript" src="js/player.js"></script>
-  <script type="text/javascript" src="js/table.js"></script>
+  <script type="text/javascript" src="js/poker/player.js"></script>
+  <script type="text/javascript" src="js/poker/table.js"></script>
   
-  <script type="text/javascript" src="js/controller.js"></script>
+  <script type="text/javascript" src="js/poker/controller.js"></script>
   <title>Poker Evaluator (Texas Holdem) - jsFiddle demo</title>
 </head>
 <body>
-  <h1>Poker Hand Thing</h1>
+
+  <div id="poker-table">
+
+    <div id="input-box">
+      <section id="welcome">
+        <h1>Poker Hand Thing</h1>
+      </section>
+    </div>
+
+    <div id="hero">Hero</div>
+    <div id="villain">Villain</div>
+
+  </div>
+
+
+<!-- 
+  <header id="header">
+    <h1></h1>
+  </header>
+  
+  <section id="table-info">
+    <form>
+      <h2>Table Info</h2>
+      <h3>Small Blind</h3>
+      <input id="small-blind" type="text"/>
+      <h3>Big Blind</h3>
+      <input id="big-blind" type="text"/>
+    </form>
+  </section>
+  
+  <section id="preflop">
+    <form>
+      <h2>Preflop Details</h2>
+      <h3>Betting Total</h3>
+      <input id="bets" type="text"/>
+      <h3>Hero Range</h3>
+      <input id="range" type="text"/>
+      <h3>Hero Pocket Cards</h3>
+      <input id="pocket1" type="text"/>
+      <input id="pocket2" type="text"/>
+    </form>
+  </section>
+  
+  <section id="flop">
+    <form>
+      <h2>Flop Details</h2>
+      <h3>Betting Total</h3>
+      <input id="bets" type="text"/>
+      <h3>Flop Cards</h3>
+      <input id="flop1" type="text"/>
+      <input id="flop2" type="text"/>
+      <input id="flop3" type="text"/>
+    </form>
+    <div id="results">
+      <h2>Results:</h2>
+    </div>
+  </section>
+ -->
 </body>
 </html>
 
